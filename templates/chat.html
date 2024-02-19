@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Service - Chat Room</title>
+</head>
+<body>
+<center>
+
+    <h1>Welcome to the Chat Room</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="message" placeholder="Type your message">
+    <button class="button-40" onclick="sendMessage()">Send</button>
+</center>
+    <script>
+        function sendMessage() {
+            var username = localStorage.getItem('username');
+            var message = document.getElementById('message').value;
+            document.getElementById('message').value = '';
+            fetch('/send_message', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'username': username,
+                    'message': message
+                })
+            });
+        }
+
+        function getMessages() {
+            fetch('/get_messages')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('chat-box').innerHTML = '';
+                    data.messages.forEach(msg => {
+                        document.getElementById('chat-box').innerHTML += '<p><strong>' + msg[0] + ':</strong> ' + msg[1] + '</p>';
+                    });
+                });
+        }
+
+        setInterval(getMessages, 1000); // Fetch messages every second
+    </script>
+</body>
+
+
+
+{% endblock %}
